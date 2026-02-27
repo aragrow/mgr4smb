@@ -1,0 +1,81 @@
+[project]
+name = "mgr4smb"
+version = "0.1.0"
+description = "Multi-agent email conversation system for SMB management"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # API Framework
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pyjwt>=2.8.0",
+
+    # MongoDB Atlas
+    "pymongo>=4.6.0",
+    "motor>=3.3.0",
+
+    # Google Gemini AI
+    "google-genai>=0.3.0",
+
+    # Gmail API
+    "google-auth>=2.25.0",
+    "google-auth-oauthlib>=1.2.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-api-python-client>=2.110.0",
+
+    # Email parsing
+    "beautifulsoup4>=4.12.0",
+    "html2text>=2024.2.26",
+
+    # Configuration & Environment
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+
+    # Async support
+    "asyncio>=3.4.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+]

@@ -1,0 +1,1 @@
+appointment_id,created_at,customer_email,customer_phone,customer_name,property_type,property_address,num_bedrooms,num_bathrooms,square_feet,preferred_date,preferred_time,service_type,status,notes

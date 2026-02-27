@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .config-bar {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .config-bar label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .config-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .config-bar button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .config-bar button:hover {
+            background: #5568d3;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .section-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Chat Section */
+        #chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Scrollbar styling for chat */
+        #chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.agent .message-avatar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.agent .message-bubble {
+            background: #f8f9fa;
+            color: #212529;
+            border: 1px solid #e9ecef;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .input-area {
+            padding: 15px 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-area input:focus {
+            border-color: #667eea;
+        }
+
+        .input-area button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-area button:hover {
+            opacity: 0.9;
+        }
+
+        .input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* JSON Section */
+        #json-editor {
+            width: 100%;
+            height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            outline: none;
+        }
+
+        #json-editor:focus {
+            border-color: #667eea;
+        }
+
+        .json-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .json-controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .json-controls .btn-send {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .json-controls .btn-clear {
+            background: #6c757d;
+            color: white;
+        }
+
+        .json-controls .btn-format {
+            background: #28a745;
+            color: white;
+        }
+
+        .json-template {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .json-template summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .json-template-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .json-template-item {
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .json-template-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .json-template-item.contact {
+            background: #e3f2fd;
+        }
+
+        .json-template-item.vendor {
+            background: #fff3e0;
+        }
+
+        .json-template-item.lead {
+            background: #f3e5f5;
+        }
+
+        .json-template-item strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 13px;
+        }
+
+        .json-template-item pre {
+            margin: 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Logs Section */
+        #logs {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            border-left: 3px solid transparent;
+        }
+
+        .log-entry.info {
+            background: #e7f3ff;
+            border-left-color: #0066cc;
+        }
+
+        .log-entry.success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .log-entry.error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .log-entry.request {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .log-entry.prompt {
+            background: #0d1117;
+            border-left-color: #58a6ff;
+            border-left-width: 4px;
+            color: #e6edf3;
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .log-entry.prompt .prompt-header {
+            color: #58a6ff;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 8px;
+        }
+
+        .log-entry.prompt .prompt-body {
+            color: #c9d1d9;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .log-divider {
+            border: none;
+            border-top: 2px dashed #30363d;
+            margin: 10px 0;
+        }
+
+        .log-timestamp {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .log-controls {
+            padding: 10px 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-controls button {
+            padding: 8px 16px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .log-controls button:hover {
+            background: #5a6268;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connected {
+            background: #4caf50;
+        }
+
+        .status-indicator.disconnected {
+            background: #f44336;
+        }
+
+        .token-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .token-status.valid {
+            color: #28a745;
+        }
+
+        .token-status.invalid {
+            color: #dc3545;
+        }
+
+        .token-icon {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Agent Test Interface</h1>
+        <p>Test your conversation agent with chat, JSON payloads, and real-time logs</p>
+    </div>
+
+    <div class="config-bar">
+        <label>API URL:</label>
+        <input type="text" id="api-url" value="http://localhost:8000/orchestrator/message" placeholder="http://localhost:8000/orchestrator/message">
+        <label>Client ID:</label>
+        <input type="text" id="client-id" value="036c5b6c-8578-4d69-8100-9ad970029d06" placeholder="client_id">
+        <label>Client Secret:</label>
+        <input type="password" id="client-secret" value="_U0IGh9wy9F1Iweqe26TM6cfpQi6Zs-rlKkfbZkWiMA" placeholder="client_secret">
+        <button id="get-token-btn">Get Token</button>
+        <div id="token-status" class="token-status invalid">
+            <span class="token-icon">✗</span>
+            <span>No Token</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Chat Section -->
+        <div class="section">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>💬 Chat Interface</span>
+                <button id="newConversationBtn" style="padding: 6px 12px; font-size: 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    🔄 New Conversation
+                </button>
+            </div>
+            <div class="section-content" id="chat-messages">
+                <div class="message agent">
+                    <div class="message-avatar">AI</div>
+                    <div>
+                        <div class="message-bubble">
+                            Hello! I'm your conversation agent. How can I help you today?<br><br>
+                            To assist you better, I'll need your contact information. Could you please provide your email address or phone number?<br><br>
+                            This information is only used to keep track of our conversation and provide you with personalized assistance. We respect your privacy and won't share your information with anyone.
+                        </div>
+                        <div class="message-time"><script>document.write(new Date().toLocaleString());</script></div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="Type your message..." />
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+
+        <!-- JSON Section -->
+        <div class="section">
+            <div class="section-header">
+                📝 JSON Payload
+            </div>
+            <div class="section-content">
+                <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: 600; font-size: 14px; color: #495057;">📝 Payload Form</label>
+                        <button id="load-csv-btn" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500;">Load from CSV</button>
+                    </div>
+                    <div id="csv-selector" style="display: none; margin-bottom: 15px; padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px;">
+                        <label style="display: block; margin-bottom: 5px; font-size: 12px; font-weight: 500; color: #495057;">Select Test Question:</label>
+                        <select id="csv-entries" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-bottom: 8px;">
+                            <option value="">-- Select an entry --</option>
+                        </select>
+                        <button id="load-entry-btn" style="padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; margin-right: 8px;">Load Entry</button>
+                        <button id="close-csv-btn" style="padding: 6px 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500;">Close</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">From Phone</label>
+                            <input type="text" id="form-from-phone" placeholder="e.g., +1234567890" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" />
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">From Email</label>
+                            <input type="text" id="form-from-email" placeholder="e.g., user@example.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" />
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">Customer Type</label>
+                            <select id="form-customer-type" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                <option value="">-- Auto-detect --</option>
+                                <option value="lead">Lead (New/Unknown)</option>
+                                <option value="prospect">Prospect (Contact, No Quote)</option>
+                                <option value="contact">Contact (Active Client)</option>
+                                <option value="vendor">Vendor</option>
+                            </select>
+                        </div>                        <div>
+                            <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">Source</label>
+                            <input type="text" id="form-source" placeholder="e.g., sms, email" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" />
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">Contact Name</label>
+                            <input type="text" id="form-contact-name" placeholder="e.g., John Doe" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;" />
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display: block; margin-bottom: 3px; font-size: 11px; color: #666;">Message Body</label>
+                        <textarea id="form-body" placeholder="Enter the message body..." style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; resize: vertical; min-height: 60px;"></textarea>
+                    </div>
+                    <div>
+                        <button id="submit-request-btn" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;">Submit Request</button>
+                    </div>
+                </div>
+                <textarea id="json-editor" placeholder="Enter your JSON payload here...">{
+  "action": "process_message",
+  "payload": {
+    "body": "Your message here"
+  }
+}</textarea>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="section">
+            <div class="section-header">
+                📊 Execution Logs
+            </div>
+            <div class="section-content" id="logs">
+                <div class="log-entry info">
+                    <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span> INFO: System initialized
+                </div>
+            </div>
+            <div class="log-controls">
+                <button id="clear-logs-btn">Clear Logs</button>
+                <button id="export-logs-btn">Export Logs</button>
+            </div>
+        </div>
+
+        <!-- LLM Prompt Section -->
+        <div class="section">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📤 LLM Prompt</span>
+                <button id="clear-prompt-btn" style="padding: 4px 10px; font-size: 11px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear</button>
+            </div>
+            <div class="section-content" id="llm-prompt-display" style="font-family: 'Courier New', monospace; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; color: #c9d1d9; background: #0d1117; line-height: 1.6; overflow-y: auto;">
+                <span style="color: #484f58; font-style: italic;">No prompt sent yet. Make a request to see the full LLM prompt here.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        let authToken = null;
+        let tokenExpiry = null;
+        let csvData = [];
+
+        // DOM Elements
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const jsonEditor = document.getElementById('json-editor');
+        const formFromPhone = document.getElementById('form-from-phone');
+        const formFromEmail = document.getElementById('form-from-email');
+        const formCustomerType = document.getElementById('form-customer-type');
+        const formSource = document.getElementById('form-source');
+        const formBody = document.getElementById('form-body');
+        const formContactName = document.getElementById('form-contact-name');
+        const submitRequestBtn = document.getElementById('submit-request-btn');
+        const loadCsvBtn = document.getElementById('load-csv-btn');
+        const csvSelector = document.getElementById('csv-selector');
+        const csvEntries = document.getElementById('csv-entries');
+        const loadEntryBtn = document.getElementById('load-entry-btn');
+        const closeCsvBtn = document.getElementById('close-csv-btn');
+        const logs = document.getElementById('logs');
+        const clearLogsBtn = document.getElementById('clear-logs-btn');
+        const exportLogsBtn = document.getElementById('export-logs-btn');
+        const apiUrlInput = document.getElementById('api-url');
+        const clientIdInput = document.getElementById('client-id');
+        const clientSecretInput = document.getElementById('client-secret');
+        const getTokenBtn = document.getElementById('get-token-btn');
+        const tokenStatus = document.getElementById('token-status');
+
+        // Logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${type.toUpperCase()}: ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function logPrompt(promptText) {
+            const timestamp = new Date().toLocaleTimeString();
+            const display = document.getElementById('llm-prompt-display');
+            display.style.color = '#c9d1d9';
+            display.textContent = `[${timestamp}]\n\n` + promptText;
+            display.scrollTop = 0;
+        }
+
+        // Update token status display
+        function updateTokenStatus() {
+            if (isTokenValid()) {
+                tokenStatus.className = 'token-status valid';
+                tokenStatus.innerHTML = '<span class="token-icon">✓</span><span>Valid Token</span>';
+            } else {
+                tokenStatus.className = 'token-status invalid';
+                tokenStatus.innerHTML = '<span class="token-icon">✗</span><span>No Token</span>';
+            }
+        }
+
+        // Get Authentication Token
+        async function getAuthToken() {
+            const apiUrl = apiUrlInput.value.replace('/orchestrator/message', '');
+            const clientId = clientIdInput.value;
+            const clientSecret = clientSecretInput.value;
+
+            log('Requesting authentication token...', 'request');
+            getTokenBtn.disabled = true;
+            getTokenBtn.innerHTML = '<span class="spinner"></span> Getting Token...';
+
+            try {
+                // Create abort controller for timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+                const response = await fetch(`${apiUrl}/auth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_id: clientId,
+                        client_secret: clientSecret
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`HTTP ${response.status}: ${errorData.detail || response.statusText}`);
+                }
+
+                const data = await response.json();
+                authToken = data.access_token;
+                tokenExpiry = Date.now() + (data.expires_in * 1000);
+
+                log('Authentication successful', 'success');
+                updateTokenStatus();
+                getTokenBtn.innerHTML = 'Get Token';
+                getTokenBtn.disabled = false;
+
+                return true;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    log(`Authentication failed: Request timed out (server may not be running)`, 'error');
+                } else {
+                    log(`Authentication failed: ${error.message}`, 'error');
+                }
+                authToken = null;
+                tokenExpiry = null;
+                updateTokenStatus();
+                getTokenBtn.innerHTML = 'Get Token';
+                getTokenBtn.disabled = false;
+                return false;
+            }
+        }
+
+        // Check if token is valid
+        function isTokenValid() {
+            if (!authToken || !tokenExpiry) return false;
+            return Date.now() < tokenExpiry - 30000; // 30 second buffer
+        }
+
+        // Send message to agent
+        async function sendMessage(payload, isChat = false) {
+            // Check token
+            if (!isTokenValid()) {
+                log('Token expired or missing, requesting new token...', 'info');
+                const success = await getAuthToken();
+                if (!success) {
+                    log('Cannot send message without valid token', 'error');
+                    return null;
+                }
+            }
+
+            const apiUrl = apiUrlInput.value;
+
+            log(`Sending ${isChat ? 'chat message' : 'JSON payload'} to agent...`, 'request');
+            log(`Payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${JSON.stringify(data)}`);
+                }
+
+                log('Response received successfully', 'success');
+                log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+
+                return data;
+            } catch (error) {
+                log(`Request failed: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Add message to chat
+        function addChatMessage(text, isUser = false) {
+            const timestamp = new Date().toLocaleTimeString();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'agent'}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isUser ? 'U' : 'AI'}</div>
+                <div>
+                    <div class="message-bubble">${escapeHtml(text)}</div>
+                    <div class="message-time">${timestamp}</div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update JSON payload question field
+        function updateJsonPayloadQuestion(question) {
+            try {
+                const payload = JSON.parse(jsonEditor.value);
+
+                // Update the question field in the payload
+                if (payload.payload) {
+                    payload.payload.question = question;
+                } else {
+                    payload.payload = { question: question };
+                }
+
+                // Update the JSON editor with the new payload
+                jsonEditor.value = JSON.stringify(payload, null, 2);
+                log('JSON payload question updated', 'info');
+            } catch (error) {
+                log(`Could not update JSON payload: ${error.message}`, 'error');
+            }
+        }
+
+        // Chat send handler
+        async function handleChatSend() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Update the JSON payload question
+            updateJsonPayloadQuestion(message);
+
+            addChatMessage(message, true);
+            chatInput.value = '';
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="spinner"></span>';
+
+            // Create payload from chat message
+            // Always include session_id for conversation continuity
+            if (!currentSessionId) {
+                currentSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            }
+
+            const payload = {
+                action: "process_message",
+                payload: {
+                    body: message,
+                    session_id: currentSessionId,
+                    source: "chat"
+                }
+            };
+
+            const response = await sendMessage(payload, true);
+
+            if (response) {
+                // Show LLM prompt in its own block before the rest of the log
+                if (response.data && response.data.llm_prompt) {
+                    logPrompt(response.data.llm_prompt);
+                }
+
+                // Log the entire response object
+                log('Full Response:', 'info');
+                log(JSON.stringify(response, null, 2), 'info');
+
+                // Add agent response to chat
+                // Check different possible response structures
+                let agentResponse = null;
+
+                if (response.customer_response) {
+                    agentResponse = response.customer_response;
+                } else if (response.data && response.data.customer_response) {
+                    agentResponse = response.data.customer_response;
+                } else if (response.data && response.data.response) {
+                    agentResponse = response.data.response;
+                } else if (response.response) {
+                    agentResponse = response.response;
+                } else if (response.message) {
+                    agentResponse = response.message;
+                }
+
+                if (agentResponse) {
+                    addChatMessage(agentResponse, false);
+                } else {
+                    // Fallback: show the entire response
+                    addChatMessage(`Response: ${JSON.stringify(response, null, 2)}`, false);
+                }
+            } else {
+                addChatMessage('Failed to get response from agent', false);
+            }
+
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'Send';
+        }
+
+        // Clear logs
+        function clearLogs() {
+            logs.innerHTML = '';
+            log('Logs cleared', 'info');
+        }
+
+        // Export logs
+        function exportLogs() {
+            const logText = logs.innerText;
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `agent-logs-${new Date().toISOString()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            log('Logs exported successfully', 'success');
+        }
+
+        // Load CSV data (from JSON API)
+        async function loadCSVData() {
+            log('Loading test entries...', 'info');
+            try {
+                const response = await fetch('/api/csv-entries');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                csvData = await response.json();
+
+                // Populate dropdown
+                csvEntries.innerHTML = '<option value="">-- Select an entry --</option>';
+                csvData.forEach((entry, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    const displayName = entry.contact_name || 'Unknown';
+                    const displayBody = entry.body.substring(0, 60) + (entry.body.length > 60 ? '...' : '');
+                    option.textContent = `#${index + 1} - ${entry.sender_type || 'UNKNOWN'} - ${displayName}: ${displayBody}`;
+                    csvEntries.appendChild(option);
+                });
+
+                // Show selector
+                csvSelector.style.display = 'block';
+                log(`Loaded ${csvData.length} test entries`, 'success');
+            } catch (error) {
+                log(`Failed to load test entries: ${error.message}`, 'error');
+            }
+        }
+
+        // Load selected CSV entry into form
+        function loadSelectedEntry() {
+            const selectedIndex = csvEntries.value;
+            if (selectedIndex === '') {
+                log('Please select an entry', 'error');
+                return;
+            }
+
+            const entry = csvData[selectedIndex];
+            formFromPhone.value = entry.from_phone || '';
+            formFromEmail.value = entry.from_email || '';
+            formCustomerType.value = entry.sender_type.toLowerCase();
+            formSource.value = entry.source;
+            formContactName.value = entry.contact_name || '';
+            formBody.value = entry.body;
+
+            log(`Loaded entry: ${entry.contact_name || 'Unknown'}`, 'success');
+            csvSelector.style.display = 'none';
+        }
+
+        // Close CSV selector
+        function closeCSVSelector() {
+            csvSelector.style.display = 'none';
+        }
+
+        // Session persistence for multi-turn conversations
+        let currentThreadId = null;
+        let currentCallId = null;
+        let currentSessionId = null;
+
+        // Submit request from form
+        async function submitRequestFromForm() {
+            const source = formSource.value.trim() || "";
+
+            // Build payload from form
+            const payload = {
+                action: "process_message",
+                payload: {
+                    source: source,
+                    body: formBody.value.trim() || "",
+                    contact_name: formContactName.value.trim() || ""
+                }
+            };
+
+            // Only add from_phone if it has a real value (not empty and not placeholder)
+            const phoneValue = formFromPhone.value.trim();
+            if (phoneValue && phoneValue !== "{{from_phone}}") {
+                payload.payload.from_phone = phoneValue;
+            }
+
+            // Only add from_email if it has a real value (not empty and not placeholder)
+            const emailValue = formFromEmail.value.trim();
+            if (emailValue && emailValue !== "{{from_email}}") {
+                payload.payload.from_email = emailValue;
+            }
+
+            // Only add customer_type if explicitly selected (not blank/auto-detect)
+            if (formCustomerType.value) {
+                payload.payload.customer_type = formCustomerType.value;
+            }
+
+            // Always include session_id for conversation continuity
+            if (!currentSessionId) {
+                currentSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            }
+            payload.payload.session_id = currentSessionId;
+
+            // Persist thread_id or call_id for conversation continuity
+            if (source === "email") {
+                if (!currentThreadId) {
+                    // Generate thread_id for this conversation
+                    currentThreadId = `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                }
+                payload.payload.thread_id = currentThreadId;
+            } else if (source === "phone") {
+                if (!currentCallId) {
+                    // Generate call_id for this conversation
+                    currentCallId = `call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                }
+                payload.payload.call_id = currentCallId;
+            }
+
+            // Get the user's message
+            const userMessage = formBody.value.trim();
+
+            // Update JSON editor to show what's being sent
+            jsonEditor.value = JSON.stringify(payload, null, 2);
+            log('Payload built from form', 'info');
+
+            // Add user message to chat
+            if (userMessage) {
+                addChatMessage(userMessage, true);
+            }
+
+            // Disable button and show loading state
+            submitRequestBtn.disabled = true;
+            submitRequestBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            // Send the request
+            const response = await sendMessage(payload, false);
+
+            if (response) {
+                log('Request submitted successfully', 'success');
+
+                // Show LLM prompt in its own block before the rest of the log
+                if (response.data && response.data.llm_prompt) {
+                    logPrompt(response.data.llm_prompt);
+                }
+
+                // Log the entire response object
+                log('Full Response:', 'info');
+                log(JSON.stringify(response, null, 2), 'info');
+
+                // Add agent response to chat
+                // Check different possible response structures
+                let agentResponse = null;
+
+                if (response.customer_response) {
+                    agentResponse = response.customer_response;
+                } else if (response.data && response.data.customer_response) {
+                    agentResponse = response.data.customer_response;
+                } else if (response.data && response.data.response) {
+                    agentResponse = response.data.response;
+                } else if (response.response) {
+                    agentResponse = response.response;
+                } else if (response.message) {
+                    agentResponse = response.message;
+                }
+
+                if (agentResponse) {
+                    addChatMessage(agentResponse, false);
+                } else {
+                    // Fallback: show the entire response
+                    addChatMessage(JSON.stringify(response, null, 2), false);
+                }
+            }
+
+            // Re-enable button
+            submitRequestBtn.disabled = false;
+            submitRequestBtn.innerHTML = 'Submit Request';
+        }
+
+        // Event Listeners
+        getTokenBtn.addEventListener('click', getAuthToken);
+        sendBtn.addEventListener('click', handleChatSend);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleChatSend();
+        });
+        submitRequestBtn.addEventListener('click', submitRequestFromForm);
+        loadCsvBtn.addEventListener('click', loadCSVData);
+        loadEntryBtn.addEventListener('click', loadSelectedEntry);
+        closeCsvBtn.addEventListener('click', closeCSVSelector);
+        clearLogsBtn.addEventListener('click', clearLogs);
+        exportLogsBtn.addEventListener('click', exportLogs);
+        document.getElementById('clear-prompt-btn').addEventListener('click', () => {
+            const display = document.getElementById('llm-prompt-display');
+            display.innerHTML = '<span style="color: #484f58; font-style: italic;">No prompt sent yet. Make a request to see the full LLM prompt here.</span>';
+        });
+
+        // New conversation button
+        const newConversationBtn = document.getElementById('newConversationBtn');
+        newConversationBtn.addEventListener('click', () => {
+            // Reset session IDs and create new session
+            currentThreadId = null;
+            currentCallId = null;
+            initializeSession();  // This will create a new session
+
+            // Clear chat messages except initial greeting
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <div class="message agent">
+                    <div class="message-avatar">AI</div>
+                    <div>
+                        <div class="message-bubble">
+                            Hello! I'm your conversation agent. How can I help you today?<br><br>
+                            To assist you better, I'll need your contact information. Could you please provide your email address or phone number?<br><br>
+                            This information is only used to keep track of our conversation and provide you with personalized assistance. We respect your privacy and won't share your information with anyone.
+                        </div>
+                        <div class="message-time">${new Date().toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+
+            log('Started new conversation (reset session)', 'info');
+        });
+
+        // Initialize or reset session
+        function initializeSession() {
+            currentSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            log(`Session created: ${currentSessionId}`, 'info');
+        }
+
+        // Initialize
+        log('Agent Test Interface ready', 'success');
+        updateTokenStatus();
+        initializeSession();  // Create session on page load
+
+        // Auto-retrieve token on page load if credentials are available
+        const clientId = clientIdInput.value.trim();
+        const clientSecret = clientSecretInput.value.trim();
+        if (clientId && clientSecret && clientId.length > 0 && clientSecret.length > 0) {
+            log('Credentials found, automatically retrieving token...', 'info');
+            getAuthToken();
+        } else {
+            log('Click "Get Token" to authenticate before sending messages', 'info');
+        }
+
+        // Check token status every 10 seconds
+        setInterval(updateTokenStatus, 10000);
+    </script>
+</body>
+</html>
